@@ -1154,7 +1154,7 @@ function ModalEstadisticas({ datos, total, onCerrar }) {
 
           {/* Gráficos */}
           {!datos ? (
-            <p style={{ textAlign: 'center', color: '#888', padding: '20px 0' }}>⏳ Cargando estadísticas...</p>
+            <p style={{ textAlign: 'center', color: '#888', padding: '20px 0' }}>⏳ Cargando estadísticas....</p>
           ) : (
             <>
               <Grafico
@@ -1174,3 +1174,5 @@ function ModalEstadisticas({ datos, total, onCerrar }) {
 }
 
 export default App;
+
+
