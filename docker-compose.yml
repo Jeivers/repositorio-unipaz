@@ -1,7 +1,18 @@
 version: '3.8'
 
 services:
-  # 1. Base de datos PostgreSQL (puerto 5432)
+  # 1. Frontend React Web (puerto 3000)
+  frontend:
+    build: ./frontend
+    container_name: cdi_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:4000
+    networks:
+      - app_net
+
+  # 2. Base de datos PostgreSQL (puerto 5432)
   db:
     image: postgres:15-alpine
     container_name: cdi_postgres
@@ -16,7 +27,7 @@ services:
     networks:
       - app_net
 
-  # 2. Backend Node API (puerto 4000)
+  # 3. Backend Node API (puerto 4000)
   backend:
     build: ./backend
     container_name: cdi_backend
@@ -32,11 +43,9 @@ services:
     networks:
       - app_net
 
-# Volumen para la persistencia de datos de PostgreSQL
 volumes:
   pg_data:
 
-# Red privada interna para la comunicación de servicios
 networks:
   app_net:
     driver: bridge
