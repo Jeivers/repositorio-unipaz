@@ -11,6 +11,8 @@ function App() {
   const [busqueda, setBusqueda] = useState('');
   const [programaFiltro, setProgramaFiltro] = useState('');
   const [documentoSeleccionado, setDocumentoSeleccionado] = useState(null);
+  const [paginaActual, setPaginaActual] = useState(1);
+  const DOCS_POR_PAGINA = 5;
 
   const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
 
@@ -88,6 +90,21 @@ function App() {
     return coincideTexto && coincidePrograma;
   });
 
+  // Paginación: slice de documentosFiltrados según la página actual
+  const totalPaginas = Math.ceil(documentosFiltrados.length / DOCS_POR_PAGINA);
+  const indiceInicio = (paginaActual - 1) * DOCS_POR_PAGINA;
+  const documentosPagina = documentosFiltrados.slice(indiceInicio, indiceInicio + DOCS_POR_PAGINA);
+
+  // Al cambiar filtro/búsqueda se vuelve siempre a la primera página
+  const handleBusquedaChange = (valor) => {
+    setBusqueda(valor);
+    setPaginaActual(1);
+  };
+  const handleProgramaChange = (valor) => {
+    setProgramaFiltro(valor);
+    setPaginaActual(1);
+  };
+
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', padding: '30px', maxWidth: '800px', margin: '0 auto' }}>
       <header style={{ borderBottom: '2px solid #004b87', paddingBottom: '10px', marginBottom: '20px' }}>
@@ -162,7 +179,7 @@ function App() {
             type="text"
             placeholder="Buscar por título o resumen..."
             value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
+            onChange={(e) => handleBusquedaChange(e.target.value)}
             style={{
               flex: '1',
               minWidth: '200px',
@@ -175,7 +192,7 @@ function App() {
           />
           <select
             value={programaFiltro}
-            onChange={(e) => setProgramaFiltro(e.target.value)}
+            onChange={(e) => handleProgramaChange(e.target.value)}
             style={{
               padding: '8px 12px',
               border: '1px solid #ccc',
@@ -211,7 +228,7 @@ function App() {
             Intenta con otros términos o cambia el filtro de programa.
           </p>
         ) : (
-          documentosFiltrados.map((doc) => (
+          documentosPagina.map((doc) => (
             <div key={doc.id} style={{ border: '1px solid #ddd', borderRadius: '6px', padding: '15px', marginBottom: '15px' }}>
               <h4 style={{ margin: '0 0 8px 0', color: '#004b87' }}>{doc.titulo}</h4>
               <p style={{ margin: '0 0 10px 0', color: '#444' }}>{doc.resumen || 'Sin resumen disponible.'}</p>
@@ -257,6 +274,48 @@ function App() {
           ))
         )}
       </section>
+
+      {/* Controles de paginación */}
+      {totalPaginas > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '20px', marginBottom: '10px' }}>
+          <button
+            onClick={() => setPaginaActual((p) => p - 1)}
+            disabled={paginaActual === 1}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '4px',
+              border: '1px solid #004b87',
+              background: paginaActual === 1 ? '#e9ecef' : '#004b87',
+              color: paginaActual === 1 ? '#aaa' : 'white',
+              cursor: paginaActual === 1 ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+            }}
+          >
+            ← Anterior
+          </button>
+
+          <span style={{ fontSize: '14px', color: '#555' }}>
+            Página <strong>{paginaActual}</strong> de <strong>{totalPaginas}</strong>
+          </span>
+
+          <button
+            onClick={() => setPaginaActual((p) => p + 1)}
+            disabled={paginaActual === totalPaginas}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '4px',
+              border: '1px solid #004b87',
+              background: paginaActual === totalPaginas ? '#e9ecef' : '#004b87',
+              color: paginaActual === totalPaginas ? '#aaa' : 'white',
+              cursor: paginaActual === totalPaginas ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+            }}
+          >
+            Siguiente →
+          </button>
+        </div>
+      )}
+
       {/* Modal de previsualización PDF */}
       {documentoSeleccionado && (
         <div
