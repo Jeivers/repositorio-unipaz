@@ -10,6 +10,7 @@ function App() {
   const [error, setError] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [programaFiltro, setProgramaFiltro] = useState('');
+  const [documentoSeleccionado, setDocumentoSeleccionado] = useState(null);
 
   const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
 
@@ -219,7 +220,21 @@ function App() {
                 <span style={{ color: 'green' }}>{doc.estado}</span>
               </small>
               {doc.archivo_url && (
-                <div style={{ marginTop: '10px' }}>
+                <div style={{ marginTop: '10px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => setDocumentoSeleccionado(doc)}
+                    style={{
+                      background: '#0069d9',
+                      color: 'white',
+                      border: 'none',
+                      padding: '6px 12px',
+                      borderRadius: '4px',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🔍 Previsualizar PDF
+                  </button>
                   <a
                     href={`${API_URL}${doc.archivo_url}`}
                     target="_blank"
@@ -242,6 +257,80 @@ function App() {
           ))
         )}
       </section>
+      {/* Modal de previsualización PDF */}
+      {documentoSeleccionado && (
+        <div
+          onClick={() => setDocumentoSeleccionado(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px',
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* Contenedor del modal — detiene la propagación para no cerrar al hacer clic dentro */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'white',
+              borderRadius: '8px',
+              width: '100%',
+              maxWidth: '860px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {/* Encabezado del modal */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '14px 20px',
+                background: '#004b87',
+                color: 'white',
+              }}
+            >
+              <span style={{ fontWeight: 'bold', fontSize: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                📄 {documentoSeleccionado.titulo}
+              </span>
+              <button
+                onClick={() => setDocumentoSeleccionado(null)}
+                aria-label="Cerrar previsualización"
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(255,255,255,0.5)',
+                  color: 'white',
+                  borderRadius: '4px',
+                  padding: '4px 10px',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  marginLeft: '12px',
+                }}
+              >
+                ✕ Cerrar
+              </button>
+            </div>
+
+            {/* Visor PDF */}
+            <iframe
+              src={`${API_URL}${documentoSeleccionado.archivo_url}`}
+              width="100%"
+              height="500px"
+              title="Previsualización PDF"
+              style={{ border: 'none', display: 'block' }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
