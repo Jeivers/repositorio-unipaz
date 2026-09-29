@@ -17,16 +17,26 @@ CREATE TABLE IF NOT EXISTS usuarios (
 );
 
 -- Tabla de Documentos / Publicaciones del Repositorio
-CREATE TABLE IF NOT EXISTS documentos (
-    id SERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    resumen TEXT,
-    archivo_url VARCHAR(255) NOT NULL,
-    fecha_publicacion DATE NOT NULL,
-    programa_id INT REFERENCES programas(id) ON DELETE SET NULL,
-    usuario_id INT REFERENCES usuarios(id) ON DELETE SET NULL,
-    estado VARCHAR(20) DEFAULT 'pendiente',
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- Schema v3 — metadatos completos del repositorio institucional CDI UNIPAZ
+DROP TABLE IF EXISTS documentos CASCADE;
+CREATE TABLE documentos (
+    id                   SERIAL PRIMARY KEY,
+    titulo_es            VARCHAR(255),                  -- título en español
+    titulo_en            VARCHAR(255),                  -- title in English
+    autores              JSONB,                         -- [{nombre, programa, codigo_estudiante}]
+    directores           JSONB,                         -- [{nombre, titulo_academico}]
+    grupo_investigacion  VARCHAR(255),
+    patrocinadores       VARCHAR(255),
+    fecha_aprobacion     DATE,
+    resumen              TEXT,                          -- resumen en español
+    palabras_claves_es   TEXT,                          -- palabras clave en español
+    tipo_documento       VARCHAR(100),                  -- Tesis, Proyecto de grado, Artículo…
+    abstract             TEXT,                          -- abstract in English
+    palabras_claves_en   TEXT,                          -- keywords in English
+    titulo_grado         VARCHAR(255),                  -- título académico al que opta
+    tipo_acceso          VARCHAR(50),                   -- Abierto | Restringido | Embargado
+    archivo_url          VARCHAR(255),                  -- ruta relativa del PDF subido
+    creado_en            TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Datos iniciales de prueba

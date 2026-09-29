@@ -41,11 +41,14 @@ services:
       - DB_NAME=cdi_unipaz
     depends_on:
       - db
+    volumes:
+      - uploads_data:/app/uploads   # persiste los PDFs subidos entre reinicios
     networks:
       - app_net
 
 volumes:
   pg_data:
+  uploads_data:    # volumen nombrado para los archivos PDF
 
 networks:
   app_net:

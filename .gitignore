@@ -1,0 +1,30 @@
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Archivos de entorno / secretos
+.env
+.env.local
+*.env
+
+# Archivos subidos por usuarios (PDFs)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# Salida de builds
+build/
+dist/
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Artefactos de la migración
+backend/migracion_errores.json
+backend/migrar_errores.json
