@@ -8,6 +8,8 @@ function App() {
   const [archivo, setArchivo] = useState(null);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState('');
+  const [busqueda, setBusqueda] = useState('');
+  const [programaFiltro, setProgramaFiltro] = useState('');
 
   const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
 
@@ -69,6 +71,21 @@ function App() {
       setEnviando(false);
     }
   };
+
+  // Filtrado en tiempo real por texto y programa
+  const documentosFiltrados = documentos.filter((doc) => {
+    const textoBusqueda = busqueda.toLowerCase();
+    const coincideTexto =
+      !textoBusqueda ||
+      (doc.titulo || '').toLowerCase().includes(textoBusqueda) ||
+      (doc.resumen || '').toLowerCase().includes(textoBusqueda);
+
+    const coincidePrograma =
+      !programaFiltro ||
+      (doc.programa || '').toLowerCase() === programaFiltro.toLowerCase();
+
+    return coincideTexto && coincidePrograma;
+  });
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', padding: '30px', maxWidth: '800px', margin: '0 auto' }}>
@@ -136,15 +153,64 @@ function App() {
         </form>
       </section>
 
+      {/* Controles de búsqueda y filtrado */}
+      <section style={{ marginBottom: '20px' }}>
+        <h3 style={{ marginBottom: '10px' }}>Buscar Documentos</h3>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Buscar por título o resumen..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            style={{
+              flex: '1',
+              minWidth: '200px',
+              padding: '8px 12px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              fontSize: '14px',
+              boxSizing: 'border-box',
+            }}
+          />
+          <select
+            value={programaFiltro}
+            onChange={(e) => setProgramaFiltro(e.target.value)}
+            style={{
+              padding: '8px 12px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              fontSize: '14px',
+              background: 'white',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="">Todos los programas</option>
+            <option value="Ingeniería de Sistemas">Ingeniería de Sistemas</option>
+            <option value="Licenciatura en Pedagogía">Licenciatura en Pedagogía</option>
+          </select>
+        </div>
+      </section>
+
       {/* Lista de documentos */}
       <section>
-        <h3>Documentos Publicados ({documentos.length})</h3>
+        <h3>
+          Documentos Publicados ({documentosFiltrados.length}
+          {documentosFiltrados.length !== documentos.length && ` de ${documentos.length}`})
+        </h3>
         {cargando ? (
           <p>Cargando información del servidor...</p>
         ) : documentos.length === 0 ? (
           <p style={{ color: '#888' }}>No hay documentos registrados aún. ¡Sé el primero en agregar uno!</p>
+        ) : documentosFiltrados.length === 0 ? (
+          <p style={{ color: '#888', fontStyle: 'italic' }}>
+            No se encontraron documentos que coincidan con{' '}
+            {busqueda && <strong>"{busqueda}"</strong>}
+            {busqueda && programaFiltro && ' en '}
+            {programaFiltro && <strong>{programaFiltro}</strong>}.{' '}
+            Intenta con otros términos o cambia el filtro de programa.
+          </p>
         ) : (
-          documentos.map((doc) => (
+          documentosFiltrados.map((doc) => (
             <div key={doc.id} style={{ border: '1px solid #ddd', borderRadius: '6px', padding: '15px', marginBottom: '15px' }}>
               <h4 style={{ margin: '0 0 8px 0', color: '#004b87' }}>{doc.titulo}</h4>
               <p style={{ margin: '0 0 10px 0', color: '#444' }}>{doc.resumen || 'Sin resumen disponible.'}</p>
