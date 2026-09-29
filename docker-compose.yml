@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # 1. Base de datos PostgreSQL (puerto 5432)
+  db:
+    image: postgres:15-alpine
+    container_name: cdi_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: cdi_unipaz
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - app_net
+
+  # 2. Backend Node API (puerto 4000)
+  backend:
+    build: ./backend
+    container_name: cdi_backend
+    ports:
+      - "4000:4000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=admin
+      - DB_PASSWORD=password123
+      - DB_NAME=cdi_unipaz
+    depends_on:
+      - db
+    networks:
+      - app_net
+
+# Volumen para la persistencia de datos de PostgreSQL
+volumes:
+  pg_data:
+
+# Red privada interna para la comunicación de servicios
+networks:
+  app_net:
+    driver: bridge
